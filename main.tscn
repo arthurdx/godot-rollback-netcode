@@ -1,0 +1,113 @@
+[gd_scene load_steps=3 format=3 uid="uid://c3xpbm6bt7dho"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_dv785"]
+[ext_resource type="PackedScene" uid="uid://bf3u7ancn1gne" path="res://player.tscn" id="2_6s2te"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("connection_panel", "host_field", "port_field", "message_label", "sync_lost_label", "server_player", "client_player")]
+script = ExtResource("1_dv785")
+connection_panel = NodePath("CanvasLayer/ConnectionPanel")
+host_field = NodePath("CanvasLayer/ConnectionPanel/GridContainer/HostField")
+port_field = NodePath("CanvasLayer/ConnectionPanel/GridContainer/PortField")
+message_label = NodePath("CanvasLayer/MessageLabel")
+sync_lost_label = NodePath("CanvasLayer/SyncLostLabel")
+server_player = NodePath("ServerPlayer")
+client_player = NodePath("ClientPlayer")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ConnectionPanel" type="PanelContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = -50.5
+offset_right = 198.0
+offset_bottom = 50.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/ConnectionPanel"]
+layout_mode = 2
+columns = 2
+
+[node name="HostLabel" type="Label" parent="CanvasLayer/ConnectionPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Host:
+"
+
+[node name="HostField" type="LineEdit" parent="CanvasLayer/ConnectionPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "127.0.0.1"
+
+[node name="PortLabel" type="Label" parent="CanvasLayer/ConnectionPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Port:
+"
+
+[node name="PortField" type="LineEdit" parent="CanvasLayer/ConnectionPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "9999"
+
+[node name="ServerButton" type="Button" parent="CanvasLayer/ConnectionPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "Server
+"
+
+[node name="ClientButton" type="Button" parent="CanvasLayer/ConnectionPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "Client
+"
+
+[node name="MessageLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResetButton" type="Button" parent="CanvasLayer"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -51.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Reset
+"
+
+[node name="SyncLostLabel" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -116.0
+offset_bottom = 26.0
+grow_horizontal = 0
+text = "Regaining Sync
+"
+
+[node name="ServerPlayer" parent="." instance=ExtResource("2_6s2te")]
+position = Vector2(237, 324)
+
+[node name="ClientPlayer" parent="." instance=ExtResource("2_6s2te")]
+position = Vector2(912, 324)
+
+[connection signal="pressed" from="CanvasLayer/ConnectionPanel/GridContainer/ServerButton" to="." method="_on_server_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/ConnectionPanel/GridContainer/ClientButton" to="." method="_on_client_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/ResetButton" to="." method="_on_reset_button_pressed"]
