@@ -12,7 +12,8 @@ var input_path_mapping_reversed := {}
 
 #flag to verify if the buffer has inputs or not
 enum HEADER_FLAGS {
-	HAS_INPUT_VECTOR = 0x01
+	HAS_INPUT_VECTOR = 0x01,
+	DROP_BOMB = 0x02,
 }
 
 func _init():
@@ -34,6 +35,8 @@ func serialize_input(all_input: Dictionary) -> PackedByteArray:
 		var input = all_input[path]
 		if input.has('input_vector'):
 			header |= HEADER_FLAGS.HAS_INPUT_VECTOR
+		if input.get('drop_bomb', false):
+			header |= HEADER_FLAGS.DROP_BOMB
 		
 		buffer.put_u8(header)
 		
@@ -66,8 +69,12 @@ func unserialize_input(serialized: PackedByteArray) -> Dictionary:
 	var path = input_path_mapping_reversed[buffer.get_u8()]
 	var input := {}
 	var header = buffer.get_u8()
-	if header and HEADER_FLAGS.HAS_INPUT_VECTOR:
+	# using & (ampersand) for bitwise and operation, since header flags
+	#is a single bit value
+	if header & HEADER_FLAGS.HAS_INPUT_VECTOR:
 		input["input_vector"] = Vector2(buffer.get_float(), buffer.get_float())
+	if header & HEADER_FLAGS.DROP_BOMB:
+		input["drop_bomb"] = true
 	
 	all_input[path] = input
 	

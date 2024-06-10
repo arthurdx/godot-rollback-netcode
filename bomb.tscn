@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://cgtt8s7mx7v1m"]
+
+[ext_resource type="Script" path="res://bomb.gd" id="1_ahjr8"]
+[ext_resource type="Texture2D" uid="uid://c5c22pjf051m2" path="res://assets/bomb.png" id="2_kge62"]
+[ext_resource type="Script" path="res://addons/godot-rollback-netcode/NetworkTimer.gd" id="3_kbghx"]
+
+[node name="Bomb" type="Node2D" node_paths=PackedStringArray("explosion_timer")]
+script = ExtResource("1_ahjr8")
+explosion_timer = NodePath("ExplosionTimer")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-1, -18)
+texture = ExtResource("2_kge62")
+
+[node name="ExplosionTimer" type="Node" parent="."]
+script = ExtResource("3_kbghx")
+wait_ticks = 60
+
+[connection signal="timeout" from="ExplosionTimer" to="." method="_on_explosion_timer_timeout"]
