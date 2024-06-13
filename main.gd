@@ -1,6 +1,9 @@
 extends Node2D
 
-@export var connection_panel : PanelContainer
+const DUMMY_NETWORK_ADAPTOR = preload("res://addons/godot-rollback-netcode/DummyNetworkAdaptor.gd")
+
+@export var main_menu: HBoxContainer
+@export var connection_panel : Popup
 @export var host_field: LineEdit
 @export var port_field: LineEdit
 @export var message_label: Label
@@ -33,6 +36,7 @@ func _on_server_button_pressed() -> void:
 	peer.create_server(int(port_field.text), 1)
 	multiplayer.multiplayer_peer = peer
 	connection_panel.visible = false
+	main_menu.visible = false
 	message_label.text = "Listening..."
 
 
@@ -41,6 +45,7 @@ func _on_client_button_pressed() -> void:
 	peer.create_client(host_field.text, int(port_field.text))
 	multiplayer.multiplayer_peer = peer
 	connection_panel.visible = false
+	main_menu.visible = false
 	message_label.text = "Connecting..."
 	
 func _on_network_peer_connected(peer_id: int) -> void:
@@ -81,7 +86,6 @@ func _on_SyncManager_sync_started() -> void:
 		if not DirAccess.dir_exists_absolute(LOG_FILE_DIRECTORY):
 			DirAccess.make_dir_absolute(LOG_FILE_DIRECTORY)
 		var datetime = Time.get_datetime_dict_from_system()
-		print(datetime)
 		var log_file_name = "%04d%02d%02d-%02d%02d%02d-peer-%d.log" % [
 			datetime['year'],
 			datetime['month'],
@@ -91,7 +95,6 @@ func _on_SyncManager_sync_started() -> void:
 			datetime['second'],
 			multiplayer.get_unique_id(),
 		]
-		print(log_file_name + "here")
 		SyncManager.start_logging(LOG_FILE_DIRECTORY + "/" + log_file_name)
 		
 func _on_SyncManager_sync_stopped() -> void:
@@ -115,4 +118,17 @@ func _on_SyncManager_sync_error(msg: String) -> void:
 func setup_match_for_replay(my_peer_id: int, peer_ids: Array, \
 	match_info: Dictionary) -> void:
 		connection_panel.visible = false
+		main_menu.visible = false
 		reset_button.visible = false
+
+
+func _on_online_button_pressed():
+	connection_panel.popup_centered()
+	SyncManager.reset_network_adaptor()
+
+
+func _on_local_button_pressed():
+	main_menu.visible = false
+	client_player.input_prefix = "player2_"
+	SyncManager.network_adaptor = DUMMY_NETWORK_ADAPTOR.new()
+	SyncManager.start()

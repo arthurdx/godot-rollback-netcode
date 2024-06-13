@@ -2,6 +2,8 @@ extends Node2D
 
 const bomb = preload("res://bomb.tscn")
 
+
+var input_prefix := "player1_"
 var speed := 0.0
 
 func _ready():
@@ -9,11 +11,12 @@ func _ready():
 	SyncManager.connect("scene_despawned", Callable(self, "_on_SyncManager_scene_despawned"))
 
 func _get_local_input() -> Dictionary:
-	var input_vector = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var input_vector = Input.get_vector(input_prefix + "left",input_prefix + "right", input_prefix \
+		 + "up", input_prefix + "down")
 	var input := {}
 	if input_vector != Vector2.ZERO:
 		input["input_vector"] = input_vector
-	if Input.is_action_just_pressed("ui_accept"):
+	if Input.is_action_just_pressed(input_prefix + "bomb"):
 		input["drop_bomb"] = true
 		
 	return input
