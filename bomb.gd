@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var explosion_timer: NetworkTimer
-const explosion = preload("res://explosion.tscn")
+const EXPLOSION = preload("res://explosion.tscn")
 
 #func _network_spawn_preprocess(data: Dictionary) -> Dictionary:
 #	data["player_path"] = data['player'].get_path()
@@ -13,8 +13,12 @@ func _network_spawn(data: Dictionary) -> void:
 	explosion_timer.start()
 	
 
+func _network_despawn() -> void:
+	pass
+	
+
 func _on_explosion_timer_timeout():
-	SyncManager.spawn("explosion", get_parent(), explosion, {
+	SyncManager.spawn("Explosion", get_parent(), EXPLOSION, {
 		position = global_position,
 	})
 	SyncManager.despawn(self)

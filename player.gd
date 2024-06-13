@@ -1,18 +1,20 @@
 extends Node2D
 
-const bomb = preload("res://bomb.tscn")
+const BOMB = preload("res://bomb.tscn")
 
 
 var input_prefix := "player1_"
 var speed := 0.0
 
-func _ready():
-	SyncManager.connect("scene_spawned", Callable(self, "_on_SyncManager_scene_spawned"))
-	SyncManager.connect("scene_despawned", Callable(self, "_on_SyncManager_scene_despawned"))
+#use if built in pooling is disabled
+
+#func _ready():
+#	SyncManager.connect("scene_spawned", Callable(self, "_on_SyncManager_scene_spawned"))
+#	SyncManager.connect("scene_despawned", Callable(self, "_on_SyncManager_scene_despawned"))
 
 func _get_local_input() -> Dictionary:
-	var input_vector = Input.get_vector(input_prefix + "left",input_prefix + "right", input_prefix \
-		 + "up", input_prefix + "down")
+	var input_vector = Input.get_vector(input_prefix + "left",input_prefix + "right", \
+		 input_prefix + "up", input_prefix + "down")
 	var input := {}
 	if input_vector != Vector2.ZERO:
 		input["input_vector"] = input_vector
@@ -31,22 +33,25 @@ func _network_process(input: Dictionary) -> void:
 	#Não determinismo devido a conta de ponto flutuante, corrigir 
 	var input_vector = input.get("input_vector", Vector2.ZERO)
 	if input_vector != Vector2.ZERO:
-		if speed < 8.0:
-			speed += 0.2
+		if speed < 16.0:
+			speed += 1.0
 		position += input_vector * speed
 	else: 
 		speed = 0 
 	
 	if input.get("drop_bomb", false):
-		SyncManager.spawn("bomb", get_parent(), bomb, { position = global_position})
-
-func _on_SyncManager_scene_spawned(name: String, spawned_node: Node2D, scene: Node2D, data: Dictionary) -> void:
-	if name == "bomb":
-		spawned_node.connect("exploded", Callable(self, "_on_bomb_exploded"))
+		SyncManager.spawn("Bomb", get_parent(), BOMB, { position = global_position})
 		
-func _on_SyncManager_scene_despawned(name: String, despawned_node: Node2D) -> void:
-	if name == "bomb":
-		despawned_node.disconnect("exploded", Callable(self, "_on_bomb_exploded"))
+
+#use if built in pooling is disabled
+
+#func _on_SyncManager_scene_spawned(name, spawned_node, scene, data) -> void:
+#	if name == "Bomb":
+#		spawned_node.connect("exploded", Callable(self, "_on_bomb_exploded"))
+#
+#func _on_SyncManager_scene_despawned(name,  despawned_node) -> void:
+#	if name == "Bomb":
+#		despawned_node.disconnect("exploded", Callable(self, "_on_bomb_exploded"))
 
 func _save_state() -> Dictionary:
 	return {
@@ -57,4 +62,7 @@ func _save_state() -> Dictionary:
 func _load_state(state: Dictionary) -> void:
 	position = state['position']
 	speed = state['speed']
+	
+func _interpolate_state(old_state: Dictionary, new_state: Dictionary, weight: float) -> void:
+	position = lerp(old_state['position'], new_state['position'], weight)
 	

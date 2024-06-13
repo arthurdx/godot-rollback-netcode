@@ -14,6 +14,6 @@ texture = ExtResource("2_kge62")
 
 [node name="ExplosionTimer" type="Node" parent="."]
 script = ExtResource("3_kbghx")
-wait_ticks = 60
+wait_ticks = 30
 
 [connection signal="timeout" from="ExplosionTimer" to="." method="_on_explosion_timer_timeout"]
