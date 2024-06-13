@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://main.gd" id="1_dv785"]
 [ext_resource type="PackedScene" uid="uid://bf3u7ancn1gne" path="res://player.tscn" id="2_6s2te"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("connection_panel", "host_field", "port_field", "message_label", "sync_lost_label", "server_player", "client_player")]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("connection_panel", "host_field", "port_field", "message_label", "sync_lost_label", "server_player", "client_player", "reset_button")]
 script = ExtResource("1_dv785")
 connection_panel = NodePath("CanvasLayer/ConnectionPanel")
 host_field = NodePath("CanvasLayer/ConnectionPanel/GridContainer/HostField")
@@ -12,6 +12,7 @@ message_label = NodePath("CanvasLayer/MessageLabel")
 sync_lost_label = NodePath("CanvasLayer/SyncLostLabel")
 server_player = NodePath("ServerPlayer")
 client_player = NodePath("ClientPlayer")
+reset_button = NodePath("CanvasLayer/ResetButton")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

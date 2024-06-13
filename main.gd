@@ -7,6 +7,11 @@ extends Node2D
 @export var sync_lost_label: Label
 @export var server_player: Node2D
 @export var client_player: Node2D
+@export var reset_button: Button
+
+const LOG_FILE_DIRECTORY = "user://detailed_logs"
+
+var logging_enabled := true
 
 func _ready() -> void:
 #	get_tree().connect("network_peer_connected", Callable(self, "_on_network_peer_connected"))
@@ -70,9 +75,28 @@ func _on_reset_button_pressed() -> void:
 	
 func _on_SyncManager_sync_started() -> void:
 	message_label.text = "Started!"
-
-func _on_SyncManager_sync_stopped() ->void:
-	pass
+	
+	if logging_enabled and not SyncReplay.active:
+		var _dir = DirAccess.open(LOG_FILE_DIRECTORY)
+		if not DirAccess.dir_exists_absolute(LOG_FILE_DIRECTORY):
+			DirAccess.make_dir_absolute(LOG_FILE_DIRECTORY)
+		var datetime = Time.get_datetime_dict_from_system()
+		print(datetime)
+		var log_file_name = "%04d%02d%02d-%02d%02d%02d-peer-%d.log" % [
+			datetime['year'],
+			datetime['month'],
+			datetime['day'],
+			datetime['hour'],
+			datetime['minute'],
+			datetime['second'],
+			multiplayer.get_unique_id(),
+		]
+		print(log_file_name + "here")
+		SyncManager.start_logging(LOG_FILE_DIRECTORY + "/" + log_file_name)
+		
+func _on_SyncManager_sync_stopped() -> void:
+	if logging_enabled:
+		SyncManager.stop_logging()
 
 func _on_SyncManager_sync_lost() -> void:
 	sync_lost_label.visible = true
@@ -87,3 +111,8 @@ func _on_SyncManager_sync_error(msg: String) -> void:
 	if peer:
 		peer.close()
 	SyncManager.clear_peers()
+	
+func setup_match_for_replay(my_peer_id: int, peer_ids: Array, \
+	match_info: Dictionary) -> void:
+		connection_panel.visible = false
+		reset_button.visible = false
