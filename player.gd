@@ -2,6 +2,8 @@ extends Node2D
 
 const bomb = preload("res://bomb.tscn")
 
+var speed := 0.0
+
 func _ready():
 	SyncManager.connect("scene_spawned", Callable(self, "_on_SyncManager_scene_spawned"))
 	SyncManager.connect("scene_despawned", Callable(self, "_on_SyncManager_scene_despawned"))
@@ -23,8 +25,14 @@ func _predict_remote_input(previous_input: Dictionary, ticks_since_real_input: i
 	return input
 
 func _network_process(input: Dictionary) -> void:
-	position += input.get("input_vector", Vector2.ZERO) * 8 #Não determinismo devido a conta de 
-	#ponto flutuante, corrigir 
+	#Não determinismo devido a conta de ponto flutuante, corrigir 
+	var input_vector = input.get("input_vector", Vector2.ZERO)
+	if input_vector != Vector2.ZERO:
+		if speed < 8.0:
+			speed += 0.2
+		position += input_vector * speed
+	else: 
+		speed = 0 
 	
 	if input.get("drop_bomb", false):
 		SyncManager.spawn("bomb", get_parent(), bomb, { position = global_position})
@@ -40,8 +48,10 @@ func _on_SyncManager_scene_despawned(name: String, despawned_node: Node2D) -> vo
 func _save_state() -> Dictionary:
 	return {
 		position = position,
+		speed = speed,
 	}
 	
 func _load_state(state: Dictionary) -> void:
 	position = state['position']
+	speed = state['speed']
 	
