@@ -86,9 +86,8 @@ player2_bomb={
 [network]
 
 rollback/max_buffer_size=15
-rollback/input_delay=1
 rollback/interpolation=true
-rollback/spawn_manager/reuse_despawned_nodes=true
+rollback/sound_manager/default_sound_bus="Sound"
 rollback/classes/message_serializer="res://customMessageSerializer.gd"
 rollback/debug/rollback_ticks=4
 rollback/debug/random_rollback_ticks=10

@@ -40,7 +40,7 @@ func _network_process(input: Dictionary) -> void:
 		speed = 0 
 	
 	if input.get("drop_bomb", false):
-		SyncManager.spawn("Bomb", get_parent(), BOMB, { position = global_position})
+		SyncManager.spawn("Bomb", get_parent(), BOMB, { position = global_position })
 		
 
 #use if built in pooling is disabled
