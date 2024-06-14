@@ -5,9 +5,9 @@ extends Node2D
 func _network_spawn(data: Dictionary) -> void:
 	global_position = data['position']
 	despawn_timer.start()
-
-
-
+	
+func _network_despawn() -> void:
+	pass
 
 func _on_despawn_timer_timeout():
 	SyncManager.despawn(self)
