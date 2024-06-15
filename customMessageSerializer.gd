@@ -12,8 +12,9 @@ var input_path_mapping_reversed := {}
 
 #flag to verify if the buffer has inputs or not
 enum HEADER_FLAGS {
-	HAS_INPUT_VECTOR = 0x01,
-	DROP_BOMB = 0x02,
+	HAS_INPUT_VECTOR = 1 << 0, #bit 0
+	DROP_BOMB = 1 << 1, #bit 1
+	TELEPORT = 1 << 2, #bit 2
 }
 
 func _init():
@@ -37,6 +38,8 @@ func serialize_input(all_input: Dictionary) -> PackedByteArray:
 			header |= HEADER_FLAGS.HAS_INPUT_VECTOR
 		if input.get('drop_bomb', false):
 			header |= HEADER_FLAGS.DROP_BOMB
+		if input.get("teleport", false):
+			header |= HEADER_FLAGS.TELEPORT
 		
 		buffer.put_u8(header)
 		
@@ -75,6 +78,8 @@ func unserialize_input(serialized: PackedByteArray) -> Dictionary:
 		input["input_vector"] = Vector2(buffer.get_float(), buffer.get_float())
 	if header & HEADER_FLAGS.DROP_BOMB:
 		input["drop_bomb"] = true
+	if header & HEADER_FLAGS.TELEPORT:
+		input["teleport"] = true
 	
 	all_input[path] = input
 	

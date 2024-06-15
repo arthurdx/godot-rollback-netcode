@@ -11,6 +11,7 @@ const DUMMY_NETWORK_ADAPTOR = preload("res://addons/godot-rollback-netcode/Dummy
 @export var server_player: Node2D
 @export var client_player: Node2D
 @export var reset_button: Button
+@export var mother_seed_generator: NetworkRandomNumberGenerator
 
 const LOG_FILE_DIRECTORY = "user://detailed_logs"
 
@@ -32,6 +33,7 @@ func _ready() -> void:
 
 
 func _on_server_button_pressed() -> void:
+	mother_seed_generator.randomize()
 	var peer := ENetMultiplayerPeer.new()
 	peer.create_server(int(port_field.text), 1)
 	multiplayer.multiplayer_peer = peer
@@ -55,12 +57,18 @@ func _on_network_peer_connected(peer_id: int) -> void:
 	if multiplayer.is_server():
 		client_player.set_multiplayer_authority(peer_id)
 		message_label.text = "Starting..."
+		rpc("setup_match", {mother_seed = mother_seed_generator.get_seed()})
 		await get_tree().create_timer(2.0).timeout
 		SyncManager.start()
 	else:
 		client_player.set_multiplayer_authority(multiplayer.get_unique_id())
-	
-	
+
+@rpc("any_peer", "call_local")
+func setup_match(info: Dictionary) -> void:
+	mother_seed_generator.set_seed(info['mother_seed'])
+	client_player.rng.set_seed(mother_seed_generator.randi())
+	server_player.rng.set_seed(mother_seed_generator.randi())
+
 func _on_network_peer_disconnected(peer_id: int) -> void:
 	message_label.text = "Disconnected"
 	SyncManager.remove_peer(peer_id)
