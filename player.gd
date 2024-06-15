@@ -2,9 +2,11 @@ extends Node2D
 
 const BOMB = preload("res://bomb.tscn")
 
+@export var rng: NetworkRandomNumberGenerator
 
 var input_prefix := "player1_"
 var speed := 0.0
+var teleporting := false
 
 #use if built in pooling is disabled
 
@@ -20,6 +22,8 @@ func _get_local_input() -> Dictionary:
 		input["input_vector"] = input_vector
 	if Input.is_action_just_pressed(input_prefix + "bomb"):
 		input["drop_bomb"] = true
+	if Input.is_action_just_pressed(input_prefix + "teleport"):
+		input["teleport"] =  true
 		
 	return input
 
@@ -37,11 +41,16 @@ func _network_process(input: Dictionary) -> void:
 			speed += 1.0
 		position += input_vector * speed
 	else: 
-		speed = 0 
+		speed = 0.0
 	
 	if input.get("drop_bomb", false):
 		SyncManager.spawn("Bomb", get_parent(), BOMB, { position = global_position })
 		
+	if input.get("teleport", false):
+		position = Vector2(rng.randi() % 1024, rng.randi() % 600)
+		teleporting = true
+	else:
+		teleporting = false
 
 #use if built in pooling is disabled
 
@@ -57,12 +66,16 @@ func _save_state() -> Dictionary:
 	return {
 		position = position,
 		speed = speed,
+		teleporting = teleporting,
 	}
 	
 func _load_state(state: Dictionary) -> void:
 	position = state['position']
 	speed = state['speed']
+	teleporting = state['teleporting']
 	
 func _interpolate_state(old_state: Dictionary, new_state: Dictionary, weight: float) -> void:
+	if old_state.get('teleporting', false) or new_state.get('teleporting', false):
+		return
 	position = lerp(old_state['position'], new_state['position'], weight)
 	

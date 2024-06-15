@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://c3xpbm6bt7dho"]
+[gd_scene load_steps=4 format=3 uid="uid://c3xpbm6bt7dho"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_dv785"]
 [ext_resource type="PackedScene" uid="uid://bf3u7ancn1gne" path="res://player.tscn" id="2_6s2te"]
+[ext_resource type="Script" path="res://addons/godot-rollback-netcode/NetworkRandomNumberGenerator.gd" id="3_ggfet"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("main_menu", "connection_panel", "host_field", "port_field", "message_label", "sync_lost_label", "server_player", "client_player", "reset_button")]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("main_menu", "connection_panel", "host_field", "port_field", "message_label", "sync_lost_label", "server_player", "client_player", "reset_button", "mother_seed_generator")]
 script = ExtResource("1_dv785")
 main_menu = NodePath("CanvasLayer/MainMenu")
 connection_panel = NodePath("CanvasLayer/ConnectionPanel")
@@ -14,6 +15,7 @@ sync_lost_label = NodePath("CanvasLayer/SyncLostLabel")
 server_player = NodePath("ServerPlayer")
 client_player = NodePath("ClientPlayer")
 reset_button = NodePath("CanvasLayer/ResetButton")
+mother_seed_generator = NodePath("MotherSeed")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -123,6 +125,9 @@ position = Vector2(237, 324)
 
 [node name="ClientPlayer" parent="." instance=ExtResource("2_6s2te")]
 position = Vector2(912, 324)
+
+[node name="MotherSeed" type="Node" parent="."]
+script = ExtResource("3_ggfet")
 
 [connection signal="pressed" from="CanvasLayer/MainMenu/LocalButton" to="." method="_on_local_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenu/OnlineButton" to="." method="_on_online_button_pressed"]
